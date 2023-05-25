@@ -8,7 +8,10 @@ type IDString string
 type IDType string 
 
 type IIdentity interface {	
-    
+
+	// Returns registry interface 
+	Registry() IIdentityRegistry
+
 	// Returns the account of an Identity 
 	Account() std.Address
 
@@ -25,12 +28,12 @@ type IIdentity interface {
 	Value(key_ string) interface{}
 }
 
-type IOrganicIdentity interface {	
+type Organic interface {	
 	//Returns the verification level of an identity (to be defined, basically KYC/AML)
 	VerificationLevel() uint64	
 }
 
-type IOrganizedEntity interface {		
+type Organized interface {		
 
 	//Returns membership status of id in a given organization 
 	MemberOf(orgIdentifier_ IDString) bool
@@ -43,12 +46,15 @@ type IOrganizedEntity interface {
 
 	// Returns count of organizations
 	TotalOrgs() uint64
-	
+
 	//Return array string of organization IDs (to noodle on...)
 	// Organizations(identifier_ IDString) []string
 }
 
-type IOrganizationalIdentity interface {	    
+type Organizer interface {	    
+
+	// Returns the Admin Identity string
+	// Admin() IDString 
 
     // Joins the Organization (must be a valid `identity`)
 	Join(identifier_ IDString) bool

@@ -9,6 +9,7 @@ import (
 
 type Identity struct {	
 	account std.Address
+	admin IDString
 	idRegistry *IdentityRegistry
 	idString IDString
 	idType IDType	
@@ -104,6 +105,9 @@ func NewOrganizationalIdentity(registry_ *IdentityRegistry, address_ std.Address
 // BASE IDENTITY
 
 // Returns the UUID of an Identity 
+func (i *Identity) Registry() IIdentityRegistry { return IIdentityRegistry(i.idRegistry) }
+
+// Returns the UUID of an Identity 
 func (i *Identity) Account() std.Address { return i.account }
 
 // Returns the UUID of an Identity 
@@ -131,6 +135,10 @@ func (i *Identity) Value(key_ string) interface{} {
 func (p *OrganicIdentity) VerificationLevel() uint64 { return p.verificationLevel }
 
 // ORGANIZATIONAL IDENTITY
+
+
+// Returns the UUID of an Identity 
+// func (o *OrganizationalIdentity) Admin() IDString { return o.admin }
 
 // Joins the Organization (must be a valid `identity`)
 func (o *OrganizationalIdentity) Join(identifier_ IDString) bool {

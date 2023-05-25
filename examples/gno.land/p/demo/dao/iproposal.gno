@@ -2,6 +2,7 @@ package dao
 
 import (
 	"std"
+	"gno.land/p/demo/identity"	
 )
 
 type IProposal interface {
@@ -10,7 +11,7 @@ type IProposal interface {
     Value() uint64	
 
     // Votes on a proposal (must be DAO `member`)
-	Vote(voter_ std.Address, vote_ int8) bool
+	Vote(voter_ identity.IDString, vote_ int8) bool
 	
     // Ends a proposal and returns final vote (must be DAO `admin`)
     Resolve() int8	
@@ -25,7 +26,7 @@ type ProposalCreated struct {
 // Emitted when citizen casts a `Vote`.
 type Voted struct {
 	proposalId uint64
-	member   std.Address
+	voter identity.IDString
 }
 
 // Emitted when `Resolve` of `Proposal` completed.

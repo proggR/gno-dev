@@ -65,21 +65,11 @@ func (ir *IdentityRegistry) Identify(type_ IDType, address_ std.Address) IDStrin
 // Returns authorization for an address to call on behalf of identity
 func (ir *IdentityRegistry) Authed(account_ std.Address, identifier_ IDString) bool {
 	_identity := ir.Identity(identifier_)
-	if _identity.Account() != account_ {
-		return false
-	}
-
-	return true
+	return _identity.Account() == account_ 
 }
 
 // Confirms valid identity
-func (ir *IdentityRegistry) Identified(identifier_ IDString) bool {
-	if !ir.identities.Has(string(identifier_)) {
-		return false
-	}
-
-	return true
-}
+func (ir *IdentityRegistry) Identified(identifier_ IDString) bool { return ir.identities.Has(string(identifier_)) }
 
 // Identifies an address as an `Identity`
 func (ir *IdentityRegistry) Identity(identifier_ IDString) IIdentity {
@@ -151,12 +141,12 @@ func (ir *IdentityRegistry) Organization(identifier_ IDString) *OrganizedOrganiz
 }
 
 // Identifies an address as an `Identity`
-func (ir *IdentityRegistry) Organized(identifier_ IDString) IOrganizedEntity {
+func (ir *IdentityRegistry) Organized(identifier_ IDString) Organized {
 	 _identity, _exists := ir.identities.Get(string(identifier_)) 
 	 
 	if !_exists {
 		panic("Identity does not exist")
 	}
 
-	return IOrganizedEntity(_identity)
+	return Organized(_identity)
 }

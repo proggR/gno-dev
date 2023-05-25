@@ -30,7 +30,7 @@ type IIdentityRegistry interface {
 	Organization(identifier_ IDString) *OrganizedOrganizationalIdentity
 
 	// Returns OrganizedEntity for valid organization identifier
-	Organized(identifier_ IDString) IOrganizedEntity
+	Organized(identifier_ IDString) Organized
 }
 
 

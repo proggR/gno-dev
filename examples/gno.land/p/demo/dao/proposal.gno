@@ -5,12 +5,13 @@ import (
 	"math"
 	"gno.land/p/demo/avl"
 	"gno.land/p/demo/ufmt"
+	"gno.land/p/demo/identity"		
 )
 
 type Proposal struct {
 	id uint64
 	dao *DAO
-	proposer std.Address
+	proposer identity.IDString
 	proposalValue uint64
 	voters avl.Tree	
     yays uint64 
@@ -18,7 +19,7 @@ type Proposal struct {
 	undecideds uint64
 }
 
-func NewProposal(dao_ *DAO, proposalIdx_ uint64, proposer_ std.Address, value_ uint64) *Proposal{	
+func NewProposal(dao_ *DAO, proposalIdx_ uint64, proposer_ identity.IDString, value_ uint64) *Proposal{	
 	return &Proposal{
 		id: proposalIdx_,
 		dao: dao_,
@@ -34,7 +35,7 @@ func NewProposal(dao_ *DAO, proposalIdx_ uint64, proposer_ std.Address, value_ u
 func (p *Proposal) Value() uint64 { return p.proposalValue }
 
 // Casts Vote for the proposal
-func (p *Proposal) Vote(voter_ std.Address, vote_ int8) bool {
+func (p *Proposal) Vote(voter_ identity.IDString, vote_ int8) bool {
 	if !p.dao.Membership(voter_){
 		panic("Must be a member to vote.")
 	}
