@@ -25,17 +25,18 @@ type OrganizationalIdentity struct {
 	members avl.Tree
 }
 
-type OrganizedIdentity struct {	
-	Identity
+type OrganizedEntity struct {	
 	organizations avl.Tree	
 }
 
 type OrganizedOrganicIdentity struct {	
-	OrganizedIdentity	
+	OrganizedEntity
+	OrganicIdentity	
 }
 
 type OrganizedOrganizationalIdentity struct {	
-	OrganizedIdentity	
+	OrganizedEntity	
+	OrganizationalIdentity
 }
 
 func genUUID(type_ string, address_ std.Address) IDString {
@@ -63,33 +64,45 @@ func genUUID(type_ string, address_ std.Address) IDString {
 	return IDString(_uuid)
 }
 
-func NewOrganicIdentity(registry_ *IdentityRegistry, address_ std.Address) *OrganicIdentity {
+func NewOrganicIdentity(registry_ *IdentityRegistry, address_ std.Address) *OrganizedOrganicIdentity {
 	_uuid := genUUID("peep",address_)
-	return &OrganicIdentity{
-		Identity: Identity{
-			account: address_,
-			idRegistry: registry_,
-			idString: _uuid, 
-			idType: IDType("organic"),
-			metaData: avl.Tree{},
+	return &OrganizedOrganicIdentity{
+		OrganizedEntity:OrganizedEntity{
+			organizations: avl.Tree{},
 		},
-		verificationLevel: 0,
+		OrganicIdentity:OrganicIdentity{
+			Identity: Identity{
+				account: address_,
+				idRegistry: registry_,
+				idString: _uuid, 
+				idType: IDType("organic"),
+				metaData: avl.Tree{},
+			},
+			verificationLevel: 0,
+		},
 	}
 }
 
-func NewOrganizationalIdentity(registry_ *IdentityRegistry, address_ std.Address) *OrganizationalIdentity {
+func NewOrganizationalIdentity(registry_ *IdentityRegistry, address_ std.Address) *OrganizedOrganizationalIdentity {
 	_uuid := genUUID("ogre",address_)
-	return &OrganizationalIdentity{
-		Identity: Identity{
-			account: address_,
-			idRegistry: registry_,
-			idString: _uuid, 
-			idType: "organization",
-			metaData: avl.Tree{},
+	return &OrganizedOrganizationalIdentity{
+		OrganizedEntity: OrganizedEntity{
+			organizations: avl.Tree{},
 		},
-		members: avl.Tree{},
+		OrganizationalIdentity:OrganizationalIdentity{
+			Identity: Identity{
+				account: address_,
+				idRegistry: registry_,
+				idString: _uuid, 
+				idType: "organization",
+				metaData: avl.Tree{},
+			},
+			members: avl.Tree{},
+		},
 	}
 }
+
+// BASE IDENTITY
 
 // Returns the UUID of an Identity 
 func (i *Identity) Account() std.Address { return i.account }
@@ -127,20 +140,26 @@ func (p *OrganicIdentity) VerificationLevel() uint64 { return p.verificationLeve
 func (o *OrganizationalIdentity) Join(identifier_ IDString) bool {
 	// enforceIdentity(o.idRegistry, identifier_)
 	_idStr := string(identifier_)
+	_joiner := (o.Identity.idRegistry).Organized(identifier_)
+
 	if o.members.Has(_idStr) {
 		return false
 	}
-	o.members.Set(_idStr,true)
+	o.members.Set(_idStr,true)	
+	_joiner.JoinedOrg(o.Identity.Get())
 	return true 
 }
 	
 // Leaves the Organization (must be a valid `identity` and already a Organization member)
 func (o *OrganizationalIdentity) Leave(identifier_ IDString) bool {
 	_idStr := string(identifier_)
+	_joiner := (o.Identity.idRegistry).Organized(identifier_)	
+
 	if !o.members.Has(_idStr) {
 		return false
 	}
 	o.members.Remove(_idStr)
+	_joiner.LeftOrg(o.Identity.Get())
 	return true 
 }
 	
@@ -152,24 +171,31 @@ func (o *OrganizationalIdentity) TotalMembers() uint64  { return uint64(o.member
 
 // ORGANIZED IDENTITY
 
-//Returns membership status of id in a given organization 
-func (oi *OrganizedIdentity) MemberOf(orgIdentifier_ IDString) bool {
+//Returns total number of organizations belonged to by an identity
+func (oi *OrganizedEntity) TotalOrgs() uint64 { return uint64(oi.organizations.Size()) }
 
-}
+//Returns membership status of id in a given organization 
+func (oi *OrganizedEntity) MemberOf(orgIdentifier_ IDString) bool { return oi.organizations.Has(string(orgIdentifier_)) }
 
 //Tracks joined organization as part of Organic Identity
-func (oi *OrganizedIdentity) JoinedOrg(orgIdentifier_ IDString) bool {
-
+func (oi *OrganizedEntity) JoinedOrg(orgIdentifier_ IDString) bool { 
+	oi.organizations.Set(string(orgIdentifier_),true) 
+	return true
 }
 	
 //Tracks left organization as part of Organic Identity
-func (oi *OrganizedIdentity) LeftOrg(orgIdentifier_ IDString) bool {
-
+func (oi *OrganizedEntity) LeftOrg(orgIdentifier_ IDString) bool {
+	_orgId := string(orgIdentifier_)
+	if !oi.organizations.Has(_orgId) {
+		return false
+	}
+	oi.organizations.Remove(_orgId)
+	return true
 }
 
 func enforceIdentity(registry_ *IdentityRegistry, caller_ IDString) {
-	// identified := registry_.Identified(caller_)
-	// if !identified {
-	// 	panic("Must register identity first")
-	// }
+	_identified := registry_.Identified(caller_)
+	if !_identified {
+		panic("Must register identity first")
+	}
 }

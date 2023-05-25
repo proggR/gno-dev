@@ -44,14 +44,19 @@ func (ir *IdentityRegistry) Identify(type_ IDType, address_ std.Address) IDStrin
 		ir.identities.Set(string(_identifier),_identity)
 		ir.organicAccounts.Set(_addressStr,_identifier)		
 		return _identifier
-	case "organization":
+	case "organization":				
 		if ir.organizationalAccounts.Has(_addressStr) {
 			panic("Address already organization identity")
 		}
+		_selfID, _exists := ir.organicAccounts.Get(_addressStr)
+		if !_exists {
+			panic("Must have personal identity to create organization")
+		}		
 		_identity := NewOrganizationalIdentity(ir,address_)
 		_identifier := _identity.Identity.Get()
 		ir.identities.Set(string(_identifier),_identity)
 		ir.organizationalAccounts.Set(_addressStr,_identifier)
+		_identity.Join(IDString(_selfID))
 		return _identifier
 	default:
 		panic("Unsupported type")
@@ -71,7 +76,27 @@ func (ir *IdentityRegistry) Authed(account_ std.Address, identifier_ IDString) b
 	if IIdentity(_identity).Account() != account_ {
 		return false
 	}
+
 	return true
+}
+
+// Confirms valid identity
+func (ir *IdentityRegistry) Identified(identifier_ IDString) bool{
+	if !ir.identities.Has(string(identifier_)) {
+		return false
+	}
+
+	return true
+}
+
+// Identifies an address as an `Identity`
+func (ir *IdentityRegistry) Interface(identifier_ IDString) *interface{} {
+	 _identity, _exists := ir.identities.Get(string(identifier_)) 
+	 
+	if !_exists {
+		panic("Identity does not exist")
+	}	
+	return &_identity
 }
 
 // Identifies an address as an `Identity`
@@ -80,9 +105,9 @@ func (ir *IdentityRegistry) Identity(identifier_ IDString) *Identity {
 	 
 	if !_exists {
 		panic("Identity does not exist")
-	}
-	
+	}	
 	_id := _identity.(*Identity)
+
 	return _id //_identity.Identity.(IIdentity).Self()
 }
 
@@ -93,11 +118,12 @@ func (ir *IdentityRegistry) OrganicID(account_ std.Address) IDString {
 	if !_idExists {
 		panic("Organic identity does not exist for account")
 	}
+
 	return _id.(IDString) 
 }
 
 // Identifies an address as an `Identity`
-func (ir *IdentityRegistry) Organic(identifier_ IDString) *OrganicIdentity {
+func (ir *IdentityRegistry) Organic(identifier_ IDString) *OrganizedOrganicIdentity {
 	 _identity, _idExists := ir.identities.Get(string(identifier_)) 
 	 
 	if !_idExists {
@@ -106,12 +132,12 @@ func (ir *IdentityRegistry) Organic(identifier_ IDString) *OrganicIdentity {
 	
 	_id := _identity.(IIdentity)
 	_organic, _organicExists := ir.organicAccounts.Get(string(_id.Account())) 
-	_idType := ufmt.Sprintf("%T", _identity)	// TODO: look into proper reflection package
-	if !_organicExists || _id.Type() != "organic" || _idType != "OrganicIdentity" {
+	// TODO: look into proper reflection package
+	if !_organicExists || _id.Type() != "organic" {
 		panic("Identity is not Organic")
 	}
 	
-	return _identity.(*OrganicIdentity)
+	return _identity.(*OrganizedOrganicIdentity)
 }
 
 // Returns the Organization IDString for a calling account
@@ -125,21 +151,31 @@ func (ir *IdentityRegistry) OrganizationID(account_ std.Address) IDString {
 }
 
 // Identifies an address as an `Identity`
-func (ir *IdentityRegistry) Organization(identifier_ IDString) *OrganizationalIdentity {
+func (ir *IdentityRegistry) Organization(identifier_ IDString) *OrganizedOrganizationalIdentity {
 	 _identity, _idExists := ir.identities.Get(string(identifier_)) 
 	 
 	if !_idExists {
 		panic("Identity does not exist")
 	}
 
-	_id := _identity.(IIdentity)
+	_id := IIdentity(_identity)
 	_organization, _organizationExists := ir.organizationalAccounts.Get(string(_id.Account())) 
-	_idType := ufmt.Sprintf("%T", _identity)
-	if !_organizationExists || _id.Type() != "organic" || _idType != "OrganizationalIdentity" {
-		panic("Identity is not Organizational")
+	if !_organizationExists || _id.Type() != "organization" {
+		panic(ufmt.Sprintf("Identity is not Organizational: %s",string(_id.Type())))
 	}
 	
-	return _identity.(*OrganizationalIdentity)
+	return _identity.(*OrganizedOrganizationalIdentity)
+}
+
+// Identifies an address as an `Identity`
+func (ir *IdentityRegistry) Organized(identifier_ IDString) IOrganizedEntity {
+	 _identity, _idExists := ir.identities.Get(string(identifier_)) 
+	 
+	if !_idExists {
+		panic("Identity does not exist")
+	}
+
+	return IOrganizedEntity(_identity)
 }
 
 // // Returns identity status of address

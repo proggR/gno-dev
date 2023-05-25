@@ -33,7 +33,7 @@ type IOrganicIdentity interface {
 	VerificationLevel() uint64	
 }
 
-type IOrganizedIdentity interface {		
+type IOrganizedEntity interface {		
 
 	//Returns membership status of id in a given organization 
 	MemberOf(orgIdentifier_ IDString) bool
@@ -44,6 +44,8 @@ type IOrganizedIdentity interface {
 	//Tracks left organization as part of Organic Identity
 	LeftOrg(orgIdentifier_ IDString) bool
 
+	// Returns count of organizations
+	TotalOrgs() uint64
 	//Return array string of organization IDs (to noodle on...)
 	// Organizations(identifier_ IDString) []string
 }

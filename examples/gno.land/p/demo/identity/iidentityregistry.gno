@@ -11,6 +11,9 @@ type IIdentityRegistry interface {
 	// Returns authorization for an address to call on behalf of identity
 	Authed(account_ std.Address, identifier_ IDString) bool
 
+	// Confirms valid identity
+	Identified(identifier_ IDString) bool
+
 	// Returns Identity for valid identifier
 	Identity(identifier_ IDString) *Identity
 
@@ -25,6 +28,9 @@ type IIdentityRegistry interface {
 
 	// Returns OrganizationalIdentity for valid organization identifier
 	Organization(identifier_ IDString) *OrganizationalIdentity
+
+	// Returns OrganizedEntity for valid organization identifier
+	Organized(identifier_ IDString) *OrganizedEntity
 }
 
 

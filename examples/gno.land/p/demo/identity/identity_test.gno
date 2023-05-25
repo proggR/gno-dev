@@ -45,7 +45,6 @@ package identity
 			 t.Errorf("Organic Self Auth Failed")
 		}
 		
-		t.Logf("Admin authed for self")
 		_adminOrgID := _ir.Identify(_organizationType, admin)
 		t.Logf("Admin created Organizational Identity: %s", string(_adminOrgID))
 		
@@ -56,15 +55,45 @@ package identity
 			 t.Errorf("Self Org Auth Failed")
 		}
 
+		_adminOrg := _ir.Organization(_adminOrgID)
+		_admin := _ir.Organized(_adminID)
+		_adminOrgMembership := _adminOrg.Membership(_adminID)		
+		_adminMemberOf := _admin.MemberOf(_adminOrgID)		
+		
+		if _adminOrgMembership {
+			t.Logf("Admin self org membership")
+		} else {
+			 t.Errorf("Self Org Membership Failed")
+		}
+		if _adminMemberOf {
+			t.Logf("Admin member of their self org")
+		} else {
+			 t.Errorf("Self Org Member of Failed")
+		}
+
 		std.TestSetOrigCaller(gnoadmin)
 		
 		_gnoadminID := _ir.Identify(_organicType, gnoadmin)		
 		t.Logf("Gnoadmin created Organic Identity: %s", string(_gnoadminID))
 		_gnoadminOrgID := _ir.Identify(_organizationType, gnoadmin)
 		t.Logf("Gnoadmin created Organizational Identity: %s", string(_gnoadminOrgID))
+		
+		_gnoadmin := _ir.Organized(_gnoadminID)
+		_invalidOrgMembership := _adminOrg.Membership(_gnoadminID)		
+		_invalidMemberOf := _gnoadmin.MemberOf(_adminOrgID)		
+		if _invalidOrgMembership {
+			t.Errorf("Incorrectly has org membership")			
+		} else {
+			t.Logf("Correctly has no org membership")
+		}
+		if _invalidMemberOf {
+			t.Errorf("Incorrectly member of org")			
+		} else {
+			t.Logf("Correctly not member of org")
+		}		
+
 
 		std.TestSetOrigCaller(manfred)
-		
 		_manfredID := _ir.Identify(_organicType, manfred)		
 		t.Logf("Manfred created Organic Identity: %s", string(_manfredID))
 		_manfredOrgID := _ir.Identify(_organizationType, manfred)
