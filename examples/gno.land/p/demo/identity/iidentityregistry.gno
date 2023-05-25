@@ -15,22 +15,22 @@ type IIdentityRegistry interface {
 	Identified(identifier_ IDString) bool
 
 	// Returns Identity for valid identifier
-	Identity(identifier_ IDString) *Identity
+	Identity(identifier_ IDString) IIdentity
 
 	// Returns the Organic IDString for a calling account
 	OrganicID(account_ std.Address) IDString	
 
 	// Returns OrganicIdentity for valid organic identifier
-	Organic(identifier_ IDString) *OrganicIdentity
+	Organic(identifier_ IDString) *OrganizedOrganicIdentity
 
 	// Returns the Organization IDString for a calling account
 	OrganizationID(account_ std.Address) IDString
 
 	// Returns OrganizationalIdentity for valid organization identifier
-	Organization(identifier_ IDString) *OrganizationalIdentity
+	Organization(identifier_ IDString) *OrganizedOrganizationalIdentity
 
 	// Returns OrganizedEntity for valid organization identifier
-	Organized(identifier_ IDString) *OrganizedEntity
+	Organized(identifier_ IDString) IOrganizedEntity
 }
 
 

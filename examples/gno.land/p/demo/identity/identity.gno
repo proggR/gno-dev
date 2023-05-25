@@ -40,7 +40,6 @@ type OrganizedOrganizationalIdentity struct {
 }
 
 func genUUID(type_ string, address_ std.Address) IDString {
-	// 	return uuid.New()
 	_bytes1 := []byte(string(address_))
 	_bytes2 := []byte(string(type_))
 	_seed := 0
@@ -106,9 +105,6 @@ func NewOrganizationalIdentity(registry_ *IdentityRegistry, address_ std.Address
 
 // Returns the UUID of an Identity 
 func (i *Identity) Account() std.Address { return i.account }
-
-// Returns the instance (weird but haxx for interface{} for now)
-func (i *Identity) Self() *Identity { return i }
 
 // Returns the UUID of an Identity 
 func (i *Identity) Get() IDString { return i.idString }

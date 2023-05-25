@@ -78,7 +78,7 @@ package identity
 		_gnoadminOrgID := _ir.Identify(_organizationType, gnoadmin)
 		t.Logf("Gnoadmin created Organizational Identity: %s", string(_gnoadminOrgID))
 		
-		_gnoadmin := _ir.Organized(_gnoadminID)
+		_gnoadmin := _ir.Organized(_gnoadminID)		
 		_invalidOrgMembership := _adminOrg.Membership(_gnoadminID)		
 		_invalidMemberOf := _gnoadmin.MemberOf(_adminOrgID)		
 		if _invalidOrgMembership {
@@ -91,6 +91,26 @@ package identity
 		} else {
 			t.Logf("Correctly not member of org")
 		}		
+
+		_joinedAdminOrg := _adminOrg.Join(_gnoadminOrgID)		
+		_validOrgMembership := _adminOrg.Membership(_gnoadminOrgID)		
+		_gnoadminOrg := _ir.Organized(_gnoadminOrgID)	
+		_validMemberOf := _gnoadminOrg.MemberOf(_adminOrgID)		
+		if _joinedAdminOrg {
+			t.Logf("Org Correctly joined another org")
+		} else {
+			t.Errorf("Org Incorrectly failed to join another org")						
+		}
+		if _validOrgMembership {
+			t.Logf("Org Correctly has org membership")
+		} else {
+			t.Errorf("Org Incorrectly has no org membership")						
+		}
+		if _validMemberOf {
+			t.Logf("Org is Correctly a member of org")						
+		} else {
+			t.Errorf("Org is Incorrectly not a member of org")
+		}
 
 
 		std.TestSetOrigCaller(manfred)

@@ -9,9 +9,6 @@ type IDType string
 
 type IIdentity interface {	
     
-	// Returns the identity
-	Self() *Identity 
-
 	// Returns the account of an Identity 
 	Account() std.Address
 
@@ -46,6 +43,7 @@ type IOrganizedEntity interface {
 
 	// Returns count of organizations
 	TotalOrgs() uint64
+	
 	//Return array string of organization IDs (to noodle on...)
 	// Organizations(identifier_ IDString) []string
 }
