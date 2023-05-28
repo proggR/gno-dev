@@ -9,8 +9,8 @@ type IDType string
 
 type IIdentity interface {	
 
-	// Returns registry interface 
-	Registry() IIdentityRegistry
+	// Returns identity registry  
+	Registry() *IdentityRegistry
 
 	// Returns the account of an Identity 
 	Account() std.Address

@@ -82,9 +82,8 @@ package dao
 		_manfredDAO := _dr.DAO(_manfredDAOID)
 
 		// DAO JOINS
-
-		_gnoadminJoined := _gnoadminDAO.Federate(_gnoadminID, _adminDAOID)
-		t.Logf("Gnoadmin Joined Admin DAO: %t", _gnoadminJoined)
+		// _gnoadminJoined := _gnoadminDAO.Federate(_gnoadminID, _adminDAOID)
+		// t.Logf("Gnoadmin Joined Admin DAO: %t", _gnoadminJoined)
 		
 		_manfredJoined := _manfredDAO.Federate(_manfredID, _adminDAOID)
 		t.Logf("Manfred Joined Admin DAO: %t", _manfredJoined)
@@ -98,8 +97,8 @@ package dao
 		// t.Logf("Manfred Joined Admin DAO: %t", _manfredJoined)
 		
 
-		_postCount := _adminDAO.TotalMembers()
-		t.Logf("Admin DAO member count: %d",_postCount)
+		_postUserCount := _adminDAO.TotalMembers()
+		t.Logf("Admin DAO member count: %d",_postUserCount)
 
 		// DAO MEMBER VOTE TEST
 
@@ -107,25 +106,60 @@ package dao
 		const _vote2 int8 = 0
 		const _vote3 int8 = -1
 
-		std.TestSetOrigCaller(admin)
-		_propId := _adminDAO.Propose(_adminID, 9002)
-		t.Logf("Proposal %d Created", _propId)
-		_adminVoted := _adminDAO.ProposalAtIndex(_propId.(uint64)).Vote(_adminID,_vote1)
-		t.Logf("Admin Voted %d on %d", _vote1, _propId)
-
-		
-		std.TestSetOrigCaller(gnoadmin)
-		_gnoadminVoted := _gnoadminDAO.FederatedVote(_gnoadminID, _adminDAOID, _vote2)
-		// Vote(_propId.(uint64),)
-		t.Logf("Gnoadmin's DAO Voted %d on %d", _vote2, _propId)
-		
-		std.TestSetOrigCaller(manfred)
-		_manfredVoted := _manfredDAO.FederatedVote(_manfredID, _adminDAOID, _vote3)
-		t.Logf("Manfred's DAO Voted %d on %d", _vote3, _propId)
+		_values := make([]interface{},1)
+		_values[0] = _adminDAOID
 
 		std.TestSetOrigCaller(admin)
-		finalVote := _adminDAO.ProposalResolve(_adminID,_propId)
-		t.Logf("Final Vote: %d", finalVote)
+		_mm :=  _gnoadminDAO.MemberMeta(_gnoadminID)
+		t.Logf("Member Meta: %d Proposed; %d Voted; %d Executed", _mm.proposalCount, _mm.proposalVoteCount, _mm.proposalExecutionCount)
+		_propId := _gnoadminDAO.Propose(_gnoadminID, ProposalType("Self"), "federate", _values)
+		t.Logf("Proposal %d Created", _propId)		
+		_prop := _gnoadminDAO.ProposalAtIndex(_propId)
+		_nonce1 := _prop.Nonce()
+		_stayed := _prop.Vote(_gnoadminID,int8(0))
+		t.Logf("Proposal %d Nonce: %d", _propId, _nonce1)
+		t.Logf("Proposal %d Voted", _propId)
+		t.Logf("Member Meta: %d Proposed; %d Voted; %d Executed", _mm.proposalCount, _mm.proposalVoteCount, _mm.proposalExecutionCount)
+
+		//TODO: fix poorly implemented Resolve
+		_resolved1 := _prop.Resolve()
+		t.Logf("Proposal %d Resolved: %d", _propId, _resolved1)		
+		_postStayCount := _adminDAO.TotalMembers()
+		t.Logf("Admin DAO member count: %d",_postStayCount)
+		_nonce2 := _prop.Nonce()
+		t.Logf("Proposal %d Nonce: %d", _propId, _nonce2)
+
+		_voted := _prop.Vote(_gnoadminID,int8(1))
+		t.Logf("Proposal %d Voted", _propId)
+		t.Logf("Member Meta: %d Proposed; %d Voted; %d Executed", _mm.proposalCount, _mm.proposalVoteCount, _mm.proposalExecutionCount)
+		
+		//TODO: fix poorly implemented Resolve
+		_resolved2 := _prop.Resolve()
+		t.Logf("Proposal %d Resolved: %d", _propId, _resolved2)		
+		_nonce3 := _prop.Nonce()
+		t.Logf("Proposal %d Nonce: %d", _propId, _nonce3)
+		_postVoteCount := _adminDAO.TotalMembers()
+		t.Logf("Admin DAO member count: %d",_postVoteCount)
+		t.Logf("Member Meta: %d Proposed; %d Voted; %d Executed", _mm.proposalCount, _mm.proposalVoteCount, _mm.proposalExecutionCount)
+
+
+
+		// _adminVoted := _adminDAO.ProposalAtIndex(_propId.(uint64)).Vote(_adminID,_vote1)
+		// t.Logf("Admin Voted %d on %d", _vote1, _propId)
+
+		
+		// std.TestSetOrigCaller(gnoadmin)
+		// _gnoadminVoted := _gnoadminDAO.FederatedVote(_gnoadminID, _adminDAOID, _vote2)
+		// // Vote(_propId.(uint64),)
+		// t.Logf("Gnoadmin's DAO Voted %d on %d", _vote2, _propId)
+		
+		// std.TestSetOrigCaller(manfred)
+		// _manfredVoted := _manfredDAO.FederatedVote(_manfredID, _adminDAOID, _vote3)
+		// t.Logf("Manfred's DAO Voted %d on %d", _vote3, _propId)
+
+		// std.TestSetOrigCaller(admin)
+		// finalVote := _adminDAO.ProposalResolve(_adminID,_propId)
+		// t.Logf("Final Vote: %d", finalVote)
 		t.Errorf("SUCCESS! FAILING NOW!")					
  	}	
  }

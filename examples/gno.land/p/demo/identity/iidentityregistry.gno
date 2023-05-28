@@ -5,7 +5,7 @@ import (
 )
 
 type IIdentityRegistry interface {	
-	// Registers an Identity to address
+	// Registers an Identity of a type to address
 	Identify(type_ IDType, address_ std.Address) IDString
 
 	// Returns authorization for an address to call on behalf of identity
@@ -14,8 +14,8 @@ type IIdentityRegistry interface {
 	// Confirms valid identity
 	Identified(identifier_ IDString) bool
 
-	// Returns Identity for valid identifier
-	Identity(identifier_ IDString) IIdentity
+	// Returns Identity for valid identifier 
+	Identity(identifier_ IDString)  IIdentity
 
 	// Returns the Organic IDString for a calling account
 	OrganicID(account_ std.Address) IDString	

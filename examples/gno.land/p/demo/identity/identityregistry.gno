@@ -71,7 +71,7 @@ func (ir *IdentityRegistry) Authed(account_ std.Address, identifier_ IDString) b
 // Confirms valid identity
 func (ir *IdentityRegistry) Identified(identifier_ IDString) bool { return ir.identities.Has(string(identifier_)) }
 
-// Identifies an address as an `Identity`
+// Returns the IIdentity of an identity for an ID
 func (ir *IdentityRegistry) Identity(identifier_ IDString) IIdentity {
 	 _identity, _exists := ir.identities.Get(string(identifier_)) 
 	 
@@ -93,7 +93,7 @@ func (ir *IdentityRegistry) OrganicID(account_ std.Address) IDString {
 	return _id.(IDString) 
 }
 
-// Identifies an address as an `Identity`
+// Returns the Organic struct for an ID (if valid and organic)
 func (ir *IdentityRegistry) Organic(identifier_ IDString) *OrganizedOrganicIdentity {
 	 _identity, _exists := ir.identities.Get(string(identifier_)) 
 	 
@@ -122,7 +122,7 @@ func (ir *IdentityRegistry) OrganizationID(account_ std.Address) IDString {
    return _id.(IDString) 
 }
 
-// Identifies an address as an `Identity`
+// Returns the Organization struct for an ID (if valid and organic)
 func (ir *IdentityRegistry) Organization(identifier_ IDString) *OrganizedOrganizationalIdentity {
 	 _identity, _exists := ir.identities.Get(string(identifier_)) 
 	 
@@ -140,7 +140,7 @@ func (ir *IdentityRegistry) Organization(identifier_ IDString) *OrganizedOrganiz
 	return _identity.(*OrganizedOrganizationalIdentity)
 }
 
-// Identifies an address as an `Identity`
+// Returns an Organized identity for an ID (if valid)
 func (ir *IdentityRegistry) Organized(identifier_ IDString) Organized {
 	 _identity, _exists := ir.identities.Get(string(identifier_)) 
 	 

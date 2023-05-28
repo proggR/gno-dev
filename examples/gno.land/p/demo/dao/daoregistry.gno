@@ -12,18 +12,10 @@ type DAORegistry struct {
     daos avl.Tree
 }
 
-func NewDAORegistry(admin_ std.Address) *DAORegistry {
-	return &DAORegistry{
-		admin: admin_, 
-		daos: avl.Tree{},
-	}
-}
-
 // Forms a new DAO
 func (dr *DAORegistry) Form(address_ std.Address, registry_ *identity.IdentityRegistry) identity.IDString {
 	_dao := NewDAO(address_, registry_, dr)
 	_identifier := _dao.Identity.Get()
-	
 	dr.daos.Set(string(_identifier),_dao)
 	
 	return _identifier	

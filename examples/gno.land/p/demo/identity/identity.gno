@@ -105,7 +105,7 @@ func NewOrganizationalIdentity(registry_ *IdentityRegistry, address_ std.Address
 // BASE IDENTITY
 
 // Returns the UUID of an Identity 
-func (i *Identity) Registry() IIdentityRegistry { return IIdentityRegistry(i.idRegistry) }
+func (i *Identity) Registry() *IdentityRegistry { return i.idRegistry }
 
 // Returns the UUID of an Identity 
 func (i *Identity) Account() std.Address { return i.account }
