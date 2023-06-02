@@ -69,8 +69,8 @@ func (d *DAO) Executor(propIdx_ uint64, delta_ *ProposalDelta) bool {
 		panic("Unsupported Proposal Type. Execution Rejected.")
 	}
 
-	_mm, _ := d.memberMeta.Get(string(_prop.Proposer()))
-	_mm.(* MemberMeta).TickExecutions()
+	// _mm, _ := d.memberMeta.Get(string(_prop.Proposer()))
+	// _mm.(* MemberMeta).TickExecutions()
 
 	return true
 }
@@ -97,16 +97,19 @@ func (d *DAO) TotalMembers() uint64 { return uint64(d.Identity.TotalMembers()) }
 
 // Creates a proposal to the DAO (must be a member)
 func (d *DAO) Propose(identifier_ identity.IDString, type_ ProposalType, subject_ string, value_ []interface{}) uint64 {
+	
 	d.enforceMember(identifier_)		
+	
 	_deltaSubject := NewSelfSubject(d, subject_)
-	_deltaValue := NewSelfValue(value_)
-
+	_deltaValue := NewSelfValue(value_)	
+	
 	d.proposalIdx++
+	
 	_delta := NewProposalDelta(type_, _deltaSubject, _deltaValue)		
 	_proposal := NewProposal(d, d.proposalIdx, identifier_, _delta)		
 	
-	_mm, _ := d.memberMeta.Get(string(identifier_))
-	_mm.(* MemberMeta).TickProposals()
+	// _mm, _ := d.memberMeta.Get(string(identifier_))
+	// _mm.(* MemberMeta).TickProposals()
 	d.proposals.Set(string(d.proposalIdx),_proposal)	
 	
 	return d.proposalIdx
@@ -123,8 +126,8 @@ func (d *DAO) Submit(identifier_ identity.IDString, type_ SubmissionType, subjec
 	_payload := NewSubmissionPayload(type_, _payloadSubject, _payloadValue)		
 	_submission := NewSubmission(d, d.submissionIdx, identifier_, _payload)
 
-	_mm, _ := d.memberMeta.Get(string(identifier_))
-	_mm.(* MemberMeta).TickSubmissions()
+	// _mm, _ := d.memberMeta.Get(string(identifier_))
+	// _mm.(* MemberMeta).TickSubmissions()
 	d.submissions.Set(string(d.submissionIdx),_submission)	
 
 	return d.submissionIdx
@@ -142,8 +145,7 @@ func (d *DAO) MemberMeta(identifier_ identity.IDString) * MemberMeta {
 // Resolves a proposal at a given index (must be `admin`)
 func (d *DAO) ProposalResolve(identifier_ identity.IDString, propId_ uint64) int8 {	
 	d.enforceAdmin(identifier_)		
-	_proposal := d.getProposal(propId_)	
-	return _proposal.Resolve()
+	return d.getProposal(propId_).Resolve()
 }
 
 // Returns a Proposal for a given index, or panics if invalid index
@@ -221,7 +223,7 @@ func (d *DAO) getProposal(idx_ uint64) *Proposal {
 		panic(ufmt.Sprintf("Invalid Proposal Identifier: %d",idx_))
 	}
 
-	return _proposal.(* Proposal)
+	return _proposal.(*Proposal)
 }
 
 func (d *DAO) addProposalType(type_ ProposalType, subject_ SubjectParser, value_ ValueParser) bool {

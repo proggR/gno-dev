@@ -6,7 +6,7 @@ package dao
 	 "gno.land/p/demo/identity"	
  )
 
- func TestIdentities(t *testing.T) {
+ func TestDAO(t *testing.T) {
  	const admin std.Address = "g138j0um48nm4ppcz0tr6az4qu3yjwjl3l6ntqdx"
  	const gnoadmin std.Address = "g1us8428u2a5satrlxzagqqa5m6vmuze025anjlj"
  	const manfred std.Address = "g1u7y667z64x2h7vc6fmpcprgey4ck233jaww9zq"
@@ -50,9 +50,9 @@ package dao
 		// 	 t.Errorf("Self Org Auth Failed")
 		// }
 
-		_admin := _ir.Organized(_adminID)
+		// _admin := _ir.Organized(_adminID)
 		_adminDAOMembership := _adminDAO.Membership(_adminID)		
-		_adminMemberOf := _admin.MemberOf(_adminDAO.ID())		
+		_adminMemberOf := _ir.MemberOf(_adminDAOID,_adminID)		
 		
 		if _adminDAOMembership {
 			t.Logf("Admin self DAO membership")

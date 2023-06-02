@@ -8,16 +8,12 @@ import (
 	"gno.land/p/demo/identity"		
 )
 
-func NewDAO(admin_ std.Address, idRegistry_ *identity.IdentityRegistry, daoRegistry_ *DAORegistry) *DAO{	
-	_orgID := idRegistry_.Identify(identity.IDType("organization"), admin_)	
-	_org := idRegistry_.Organization(_orgID)
-	
-	_id := idRegistry_.OrganicID(admin_)
+func NewDAO(admin_ std.Address, org_ *identity.OrganizedOrganizationalIdentity, daoRegistry_ *DAORegistry) *DAO{
 	_mm := avl.Tree{}
-	_mm.Set(string(_id),NewMemberMeta())
+	_mm.Set(string(org_.Get()),NewMemberMeta())
 	
 	return &DAO{
-		Identity: _org,
+		Identity: org_,
 		daoRegistry: daoRegistry_,
 		memberMeta: _mm,
 		proposalIdx: 0,
@@ -29,7 +25,7 @@ func NewDAO(admin_ std.Address, idRegistry_ *identity.IdentityRegistry, daoRegis
 	}	
 }
 
-func NewMemberMeta() * MemberMeta {
+func NewMemberMeta() *MemberMeta {
 	return &MemberMeta{
 		proposalCount:0,
 		submissionCount:0,
@@ -86,6 +82,7 @@ func NewProposal(dao_ *DAO, proposalIdx_ uint64, proposer_ identity.IDString, de
 		voterNonces: avl.Tree{},
 		votingSessions: _sessions,
 		nonce: 0,
+		result: 0,
 	}
 }
 

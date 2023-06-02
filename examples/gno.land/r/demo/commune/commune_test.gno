@@ -1,118 +1,154 @@
 package commune
 
-import (
-	"std"
-	"testing"
+ import (
+ 	"std"
+ 	"testing"
+	 "gno.land/p/demo/ufmt"	
+	 "gno.land/p/demo/identity"	
+	 "gno.land/p/demo/dao"	
+	 "gno.land/r/demo/citizen"	
+ )
 
-	"gno.land/r/demo/citizen"
-)
+ func TestCommune(t *testing.T) {
+ 	const admin std.Address = "g138j0um48nm4ppcz0tr6az4qu3yjwjl3l6ntqdx"
+ 	const gnoadmin std.Address = "g1us8428u2a5satrlxzagqqa5m6vmuze025anjlj"
+ 	const manfred std.Address = "g1u7y667z64x2h7vc6fmpcprgey4ck233jaww9zq"
 
-func TestCitizensMembersVoteResolution(t *testing.T) {
-	const admin std.Address = "g138j0um48nm4ppcz0tr6az4qu3yjwjl3l6ntqdx"
-	const gnoadmin std.Address = "g1us8428u2a5satrlxzagqqa5m6vmuze025anjlj"
-	const manfred std.Address = "g1u7y667z64x2h7vc6fmpcprgey4ck233jaww9zq"
+ 	type BooleanTest struct {
+ 		name    string
+ 		response bool
+ 		fn      func() bool
+ 	}
 
-	type BooleanTest struct {
-		name    string
-		response bool
-		fn      func() bool
-	}
+ 	// walk through creating organic and org ids, asserting only one of each per person
+ 	{
 
-	// // Check that citizenship calls respond as expected. Register 3 Citizens to test 2/3 threshhold.
-	// {
-	// 	citizenTests := []BooleanTest{
-	// 		{"Admin Auto Citizen", true, func() bool { return citizen.Citizenship(admin) }},
-	// 		{"Non Citizen Is False", false, func() bool { return citizen.Citizenship(gnoadmin) }},
-	// 		{"Non Citizen Naturalizes", true, func() bool { 
-	// 			std.TestSetOrigCaller(gnoadmin)
-	// 			return citizen.Naturalize() 
-	// 		}},
-	// 		{"Naturalized Is Citizen", true, func() bool { return citizen.Citizenship(gnoadmin) }},
-	// 		{"Naturalized Cannot Naturalize", false, func() bool { 
-	// 			std.TestSetOrigCaller(gnoadmin)
-	// 			return citizen.Naturalize() 
-	// 		}},
-	// 		{"Non Citizen Naturalizes", true, func() bool { 
-	// 			std.TestSetOrigCaller(manfred)
-	// 			return citizen.Naturalize() 
-	// 		}},
-	// 	}
-	// 	for _, tc := range citizenTests {
-	// 		tr := tc.fn()
-	// 		if tr != tc.response {
-	// 			t.Errorf("%s: have: %t want: %t", tc.name, tr, tc.response)
-	// 		}
-	// 	}
-	// }
-	
+		const _organicType identity.IDType = "organic"
 
-	// Check that DAO membership calls respond as expected. Register 3 Citizens to test 2/3 threshhold.
-	{
-		std.TestSetOrigCaller(admin)
-		membershipTests := []BooleanTest{
-			{"Admin Auto Member", true, func() bool { return Member(admin) }},
-			{"Non Member Is False", false, func() bool { return Member(gnoadmin) }},
-			{"Non Member 1  Joins", true, func() bool { 
-				std.TestSetOrigCaller(gnoadmin)
-				return Join() 
-			}},
-			{"Joined Is Member", true, func() bool { return Member(gnoadmin) }},
-			{"Joined Cannot Join", false, func() bool { 
-				std.TestSetOrigCaller(gnoadmin)
-				return Join() 
-			}},
-			{"Non Member 2 Joins", true, func() bool { 
-				std.TestSetOrigCaller(manfred)
-				return Join() 
-			}},
-		}
-		for _, tc := range membershipTests {
-			tr := tc.fn()
-			if tr != tc.response {
-				t.Errorf("%s: have: %t want: %t", tc.name, tr, tc.response)
-			}else{
-				t.Logf("%s: PASSED; have: %t, want %t",tc.name, tr, tc.response)
-			}
-		}
-	}	
 
-	// Check that DAO Proposal/Vote calls respond as expected.
-	{
-
-		// got := panicValue(func() { 
-		// 	std.TestSetOrigCaller(gnoadmin)
-		// 	ProposeChange(9001)
-		// })
-		// err, ok := got.(error)
-		// if !ok {
-		// 	t.Logf("Panicked: %s", err)
-		// }
-		std.TestSetOrigCaller(admin)
-		_propId := ProposeChange(9002)
-		t.Logf("Proposal %d Created", _propId)
-		// Vote(_propId.(uint64),1)
-		// t.Logf("Admin Voted %d on %d", 1, _propId)
-
-		// std.TestSetOrigCaller(gnoadmin)
-		// Vote(_propId.(uint64),-1)
-		// t.Logf("Gnoadmin Voted %d on %d", -1, _propId)
+ 		std.TestSetOrigCaller(admin)
+				
+		// _adminID := identityRegistry.OrganicID(admin) //citizen.Naturalize()		
+		_adminID := citizen.ID(_organicType, admin)		
+		t.Logf("Admin created Organic Identity: %s", string(_adminID))		
 		
-		// std.TestSetOrigCaller(manfred)
-		// Vote(_propId.(uint64),0)
-		// t.Logf("Manfred Voted %d on %d", 0, _propId)
+		// _selfAuth := identityRegistry.Authed(admin, _adminID)		
+		// if _selfAuth {
+		// 	t.Logf("Admin authed for organic self")
+		// } else {
+		// 	 t.Errorf("Organic Self Auth Failed")
+		// }
+		
+		_adminDAOID := Form()
+		t.Logf("Admin created DAO: %s", string(_adminDAOID))
+		
+		_adminDAO := daoRegistry.DAO(_adminDAOID)
+		// _admin := identityRegistry.Organized(_adminID)
+		_adminDAOMembership := Member(_adminDAOID, _adminID)		
+		// _adminMemberOf := identityRegistry.MemberOf(_adminID, _adminDAOID)		
+		
+		if _adminDAOMembership {
+			t.Logf("Admin self DAO membership")
+		} else {
+			 t.Errorf("Self DAO Membership Failed")
+		}
+		
+		// if _adminMemberOf {
+		// 	t.Logf("Admin member of their self DAO")
+		// } else {
+		// 	 t.Errorf("Self DAO Member of Failed")
+		// }
+		_preCount := TotalMembers(_adminDAOID)
+		t.Logf("Admin DAO member count: %d",_preCount)
 
-		std.TestSetOrigCaller(admin)
-		finalVote := ProposalResolve(_propId)
-		t.Logf("Final Vote: %d", finalVote)
-		t.Errorf("SUCCESS! FAILING NOW!")
-	}	
-}
+		std.TestSetOrigCaller(gnoadmin)		
+		_gnoadminID := citizen.Naturalize()
+		// _gnoadminID := citizen.Naturalize()		
+		t.Logf("Gnoadmin created Organic Identity: %s", string(_gnoadminID))
+				
+		_gnoadminDAOID := Form()
+		t.Logf("Gnoadmin formed Commune: %s", string(_gnoadminDAOID))
+		// _gnoadminDAO := daoRegistry.DAO(_gnoadminDAOID)
 
 
-func panicValue(fn func()) (recovered interface{}) {
-    defer func() {
-        recovered = recover()
-    }()
-    fn()    
-	return
-}
+		std.TestSetOrigCaller(manfred)
+		_manfredID := citizen.Naturalize()
+		// _manfredID := citizen.Naturalize()
+		t.Logf("Manfred created Organic Identity: %s", string(_manfredID))
+
+		_manfredDAOID := Form()
+		t.Logf("Manfred formed Commune: %s", string(_manfredDAOID))
+		// _manfredDAO := daoRegistry.DAO(_manfredDAOID)
+
+		// // DAO JOINS
+		
+		// _manfredJoined := _manfredDAO.Federate(_manfredID, _adminDAOID)
+		_manfredJoined := Federate(_manfredDAOID, _adminDAOID)
+		t.Logf("Manfred DAO Admin-Federated With Admin DAO: %t", _manfredJoined)
+		
+
+		_postUserCount := TotalMembers(_adminDAOID)
+		t.Logf("Admin DAO member count: %d",_postUserCount)
+
+		// DAO MEMBER VOTE TEST
+
+		const _vote1 int8 = 1
+		const _vote2 int8 = 0
+		const _vote3 int8 = -1
+
+		_values := make([]interface{},1)
+		_values[0] = _adminDAOID
+
+		
+		// _mm :=  _gnoadminDAO.MemberMeta(_gnoadminID)
+		// t.Logf("Member Meta: %d Proposed; %d Voted; %d Executed", _mm.proposalCount, _mm.proposalVoteCount, _mm.proposalExecutionCount)
+		
+		std.TestSetOrigCaller(gnoadmin)		
+		_propId := ProposeChange(_gnoadminDAOID, dao.ProposalType("Self"), "federate", _values)		
+		
+		t.Logf("Proposal %d Created", _propId)		
+		
+		_prop := Proposal(_gnoadminDAOID, _propId)
+
+		_nonce1 := _prop.Nonce()
+		
+		_stayed := Vote(_gnoadminDAOID,_propId,int8(0))		
+		t.Logf("Proposal %d Nonce: %d", _propId, _nonce1)
+		t.Logf("Proposal %d Voted", _propId)
+		
+		// t.Logf("Member Meta: %d Proposed; %d Voted; %d Executed", _mm.proposalCount, _mm.proposalVoteCount, _mm.proposalExecutionCount)
+
+		//TODO: fix poorly implemented Resolve
+		_resolved1 := ProposalResolve(_gnoadminDAOID, _propId)
+		t.Logf("Proposal %d Resolved: %d", _propId, _resolved1)		
+		_postStayCount := TotalMembers(_adminDAOID)
+		t.Logf("Admin DAO member count: %d",_postStayCount)
+		_nonce2 := _prop.Nonce()
+		t.Logf("Proposal %d Nonce: %d", _propId, _nonce2)
+
+		_voted := Vote(_gnoadminDAOID,_propId,int8(1))
+		t.Logf("Proposal %d Voted", _propId)
+		// t.Logf("Member Meta: %d Proposed; %d Voted; %d Executed", _mm.proposalCount, _mm.proposalVoteCount, _mm.proposalExecutionCount)
+		
+		//TODO: fix poorly implemented Resolve
+		_resolved2 := ProposalResolve(_gnoadminDAOID, _propId)
+		t.Logf("Proposal %d Resolved: %d", _propId, _resolved2)
+		_nonce3 := _prop.Nonce()
+		t.Logf("Proposal %d Nonce: %d", _propId, _nonce3)
+		_postVoteCount := TotalMembers(_adminDAOID)
+		t.Logf("Admin DAO member count: %d",_postVoteCount)
+		// t.Logf("Member Meta: %d Proposed; %d Voted; %d Executed", _mm.proposalCount, _mm.proposalVoteCount, _mm.proposalExecutionCount)
+
+
+		t.Errorf("SUCCESS! FAILING NOW!")					
+ 	}	
+ }
+
+
+ func panicValue(fn func()) (recovered interface{}) {
+     defer func() {
+         recovered = recover()
+     }()
+     fn()    
+ 	return
+ }

@@ -7,6 +7,13 @@ import (
 type IDString string 
 type IDType string 
 
+type Identifier func(IDType, std.Address) IDString
+type Revealer func(IDType, IDString) std.Address
+type Registrar func(IDType, std.Address) IDString
+type OrganicResolver func(IDString) *OrganizedOrganicIdentity
+type OrganizationResolver func(IDString) *OrganizedOrganizationalIdentity
+
+
 type IIdentity interface {	
 
 	// Returns identity registry  

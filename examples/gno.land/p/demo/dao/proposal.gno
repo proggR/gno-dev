@@ -32,6 +32,7 @@ type Proposal struct {
 	voterNonces avl.Tree 
 	votingSessions avl.Tree
 	nonce uint64
+	result int8
 }
 
 // PROPOSAL
@@ -48,12 +49,15 @@ func (p *Proposal) Delta() *ProposalDelta { return p.proposalDelta }
 
 func (p *Proposal) Nonce() uint64 { return p.nonce }
 
+func (p *Proposal) Result() int8 { return p.result }
+
 func (p *Proposal) Exec() bool { 
-	return p.DAO().Executor(p.id, p.proposalDelta)	
+	return p.DAO().Executor(p.id, p.proposalDelta)
 }
 
 // Casts Vote for the proposal
 func (p *Proposal) Vote(voter_ identity.IDString, vote_ int8) bool {
+	
 	if !p.dao.Membership(voter_){
 		panic("Must be a member to vote.")
 	}
@@ -84,7 +88,7 @@ func (p *Proposal) Vote(voter_ identity.IDString, vote_ int8) bool {
 
 	_session.voters.Set(_voterStr,true)
 	p.weightedVote(_session, voter_, vote_)
-	p.DAO().TickProposalVotes(voter_)
+	// p.DAO().TickProposalVotes(voter_)
 	
 	return true
 }
@@ -113,7 +117,7 @@ func (p *Proposal) Resolve() int8 {
 	} else {
 		p.nonceTick()
 	}	
-
+	p.result = _results
 	return _results
 }
 

@@ -141,6 +141,17 @@ func (ir *IdentityRegistry) Organization(identifier_ IDString) *OrganizedOrganiz
 }
 
 // Returns an Organized identity for an ID (if valid)
+func (ir *IdentityRegistry) MemberOf(identifier_ IDString, orgIdentifier_ IDString) bool {
+	 _identity, _exists := ir.identities.Get(string(identifier_)) 
+	 
+	if !_exists {
+		panic("Identity does not exist")
+	}
+
+	return Organized(_identity).MemberOf(orgIdentifier_)
+}
+
+// Returns an Organized identity for an ID (if valid)
 func (ir *IdentityRegistry) Organized(identifier_ IDString) Organized {
 	 _identity, _exists := ir.identities.Get(string(identifier_)) 
 	 

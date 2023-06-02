@@ -2,7 +2,8 @@ package identity
 
 import (
 	"std"
-	"gno.land/p/demo/rand"
+	// "math/rand"
+	// "crypto/rand"
 	"gno.land/p/demo/avl"
 	"gno.land/p/demo/ufmt"
 )
@@ -41,25 +42,27 @@ type OrganizedOrganizationalIdentity struct {
 }
 
 func genUUID(type_ string, address_ std.Address) IDString {
-	_bytes1 := []byte(string(address_))
-	_bytes2 := []byte(string(type_))
-	_seed := 0
+	_uuid := type_+string(address_)
+	// TODO: update to use crypto/rand... not sure how this worked before...
+	// _bytes1 := []byte(string(address_))
+	// _bytes2 := []byte(string(type_))
+	// _seed := 0
 
 		
-    for i := 0; i < 4; i++ {
-        _seed = _seed << 8
-        _seed += int(_bytes2[i])
+    // for i := 0; i < 4; i++ {
+    //     _seed = _seed << 8
+    //     _seed += int(_bytes2[i])
 
-    }		
-    for i := 0; i < 4; i++ {
-        _seed = _seed << 8
-        _seed += int(_bytes1[i])
+    // }		
+    // for i := 0; i < 4; i++ {
+    //     _seed = _seed << 8
+    //     _seed += int(_bytes1[i])
 
-    }
+    // }
 
-	// TODO: look into proper UUID
-	_r := rand.FromSeed(int64(_seed))
-	_uuid := ufmt.Sprintf("%d-%d-%d-%d-%d", _r.Int63(), _r.Int63(), _r.Int63(), _r.Int63(), _r.Int63())
+	// // TODO: look into proper UUID
+	// _r := rand.FromSeed(int64(_seed))
+	// _uuid := ufmt.Sprintf("%d-%d-%d-%d-%d", _r.Int63(), _r.Int63(), _r.Int63(), _r.Int63(), _r.Int63())
 
 	return IDString(_uuid)
 }

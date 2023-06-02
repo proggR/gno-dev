@@ -13,11 +13,11 @@ type DAORegistry struct {
 }
 
 // Forms a new DAO
-func (dr *DAORegistry) Form(address_ std.Address, registry_ *identity.IdentityRegistry) identity.IDString {
-	_dao := NewDAO(address_, registry_, dr)
-	_identifier := _dao.Identity.Get()
-	dr.daos.Set(string(_identifier),_dao)
+func (dr *DAORegistry) Form(address_ std.Address, org_ *identity.OrganizedOrganizationalIdentity) identity.IDString {
 	
+	_dao := NewDAO(address_, org_, dr)
+	_identifier := _dao.Identity.Get()
+	dr.daos.Set(string(_identifier),_dao)	
 	return _identifier	
 }
 
@@ -30,12 +30,14 @@ func (dr *DAORegistry) Authed(identifier_ identity.IDString, orgIdentifier_ iden
 }
 
 // Identifies an address as an `Identity`
+func (dr *DAORegistry) Exists(identifier_ identity.IDString) bool { return dr.daos.Has(string(identifier_)) }
+
+// Identifies an address as an `Identity`
 func (dr *DAORegistry) DAO(identifier_ identity.IDString) *DAO {
 	 _dao, _exists := dr.daos.Get(string(identifier_)) 
 	 
 	if !_exists {
 		panic("Identity does not exist")
 	}
-	
 	return _dao.(*DAO)
 }
